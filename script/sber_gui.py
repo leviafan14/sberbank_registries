@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 import os
 import dbf
 import fdb
@@ -112,8 +111,9 @@ def archive():
         z_name=str(zip_name[0:2])
         r_list=[str(reester_rename),str(z_name)]
         return r_list
-    except:
+    except Exception as e:
           messagebox.showerror('Ошибка', 'Не удалось распаковать архив')
+          print(e)
           return  False
     return reester_rename
      
@@ -132,7 +132,7 @@ def tv_pay(abonent,pay_sum,trans_num):
     return int(n_cont[0])
 
 #Функция обработки платежей    
-def get_pay():
+def get_pay(result_txt):
     global pay_sum_fall, pay_sum_amount, abonent_count_fall
     state_reester='complate_' # подпись добавляется к названию реестра, если он успешно обработан
     #Если реестр не выбран, то функция завершается
@@ -275,7 +275,7 @@ def get_pay():
     shutil.move(fd, path_complate+state_reester+reester_name)# Перемещение реестра если он успешно обработан
 
 #Функция открытия и просмотра реестра в окне программы
-def open_register():
+def open_register(result_txt):
     #Выбираем реестр из папки
     register_path=filedialog.askopenfilename(initialdir =path_result,title = "Укажите обработанный реестр для чтения")
     if(not register_path): #Если реестр не выбран
@@ -289,41 +289,7 @@ def open_register():
         result_txt.configure(state='disable')#Запрещаем редактирование поля вывода платежей
     except Exception as e:
         messagebox.showerror('Ошибка', 'Не удалось открыть реестр')
+        print(e)
         
-#Конфигурация окна
-window = Tk()
-window.geometry('800x600')
-window.title("Сбербанк реестры")# Заголовок окна
-    
-#Описание виджетов
 
-#Button
-btn_inet= Button(window, text="Обработать реестр",width=15,command=get_pay)
-btn_print_reg= Button(window, text="Печать",width=15,command=lambda:reg_printer(result_txt))
-btn_open_register=Button(window, text="Открыть реестр",width=15,command=open_register)
-
-#Label
-lbl_zip_path= Label(window, text="Путь к архиву: "+zip_path)
-lbl_zip_complate_path= Label(window, text="Путь к обработанным архивам: "+zip_complate_path)
-lbl_unzip_path= Label(window, text="Путь к реестрам после распаковки: "+unzip_path)
-lbl_path_complate=Label(window, text="Путь к обработанным реестрам: "+path_complate)
-lbl_path_result_registries=Label(window, text="Путь к результату :"+path_result)
-
-#Виджет вывода на экран
-result_txt=scrolledtext.ScrolledText(window,state='disable')
-
-#Размещение виджетов в окне программы
-btn_inet.pack()
-btn_print_reg.pack()
-btn_open_register.pack()
-lbl_zip_path.pack()
-lbl_unzip_path.pack()
-lbl_path_complate.pack()
-lbl_zip_complate_path.pack()
-lbl_path_result_registries.pack()
-result_txt.pack(expand = True, fill=BOTH)
-
-#Вызов окна
-check_exists_folders(folders_list)#Вызов функции проверки сущестования необхидимых папок
-window.mainloop()
 
