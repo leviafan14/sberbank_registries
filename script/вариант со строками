@@ -1,0 +1,9 @@
+find_result=str(response).strip().find('</comment>')
+    print(find_result)
+    start_index=int(find_result)-2
+    sub_str_result=str(response)[start_index:int(find_result)]
+    print(sub_str_result)
+    if(sub_str_result=='OK'):
+        print('good pay')
+    else:
+        print('bad_pay')
