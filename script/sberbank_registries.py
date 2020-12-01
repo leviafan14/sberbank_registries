@@ -5,7 +5,7 @@ def main():
     #Конфигурация окна
     window = Tk()
     window.geometry('800x600')
-    window.title("Сбербанк реестры")# Заголовок окна
+    window.title("Сбербанк реестры")
     
     #Описание виджетов
     
@@ -13,16 +13,16 @@ def main():
     result_txt=scrolledtext.ScrolledText(window,state='disable')
     
     #Button
-    btn_inet= Button(window, text="Обработать реестр",width=15,command=lambda:get_pay(result_txt))
-    btn_print_reg= Button(window, text="Печать",width=15,command=lambda:reg_printer(result_txt))
-    btn_open_register=Button(window, text="Открыть реестр",width=15,command=lambda:open_register(result_txt))
+    btn_inet = Button(window, text="Обработать реестр",width=15,command=lambda:get_pay(result_txt))
+    btn_print_reg = Button(window, text="Печать",width=15,command=lambda:reg_printer(result_txt))
+    btn_open_register = Button(window, text="Открыть реестр",width=15,command=lambda:open_register(result_txt))
 
     #Label
-    lbl_zip_path= Label(window, text="Путь к архиву: "+zip_path)
-    lbl_zip_complate_path= Label(window, text="Путь к обработанным архивам: "+zip_complate_path)
-    lbl_unzip_path= Label(window, text="Путь к реестрам после распаковки: "+unzip_path)
-    lbl_path_complate=Label(window, text="Путь к обработанным реестрам: "+path_complate)
-    lbl_path_result_registries=Label(window, text="Путь к результату :"+path_result)
+    lbl_zip_path = Label(window, text="Путь к архиву: "+zip_path)
+    lbl_zip_complate_path = Label(window, text="Путь к обработанным архивам: "+zip_complate_path)
+    lbl_unzip_path = Label(window, text="Путь к реестрам после распаковки: "+unzip_path)
+    lbl_path_complate = Label(window, text="Путь к обработанным реестрам: "+path_complate)
+    lbl_path_result_registries = Label(window, text="Путь к результату :"+path_result)
 
     
     #Размещение виджетов в окне программы
@@ -39,6 +39,6 @@ def main():
     #Вызов окна
     check_exists_folders(folders_list)#Вызов функции проверки сущестования необхидимых папок
     window.mainloop()
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
     
