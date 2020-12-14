@@ -1,18 +1,18 @@
 import os
 import dbf
 import fdb
+from PyQt5 import Qt
+from PyQt5.QtWidgets import QTextEdit,QApplication
 import shutil
 import subprocess
-import urllib
+from subprocess import Popen, PIPE
 from tkinter import *
 from tkinter import filedialog
 from tkinter import scrolledtext
 from tkinter import messagebox
+import urllib
 import urllib.request
 import zipfile
-from subprocess import Popen, PIPE
-from PyQt5 import Qt
-from PyQt5.QtWidgets import QTextEdit,QApplication
 
 # Описание переменных программы
 
@@ -83,15 +83,15 @@ def pay_test(abonent,pay_sum,trans_num):
     return int(0)
 
 
-#Функция определяет успешно добавлен платеж или нет
+# Функция определяет успешно добавлен платеж или нет
 def type_pay(abonent, pay_sum, trans_num, date_transaction, date_check, action_pay):
     global state_pay,pay_sum_fall,abonent_count_fall
 
     # Если сумма платежа предположительно за ТВ
     if action_pay == 123:
         state_pay = ' Attention!'
-        pay_sum_fall += pay_sum #Сумма не проведенных платежей
-        abonent_count_fall += 1 #Увеличить количество не прошедших платежей на 1
+        pay_sum_fall += pay_sum # Сумма не проведенных платежей
+        abonent_count_fall += 1 # Увеличить количество не прошедших платежей на 1
         return pay_sum_fall, abonent_count_fall, state_pay
 
     # Если сумма платежа за ТВ больше или равна 420 р. то делается пометка
@@ -101,9 +101,9 @@ def type_pay(abonent, pay_sum, trans_num, date_transaction, date_check, action_p
 
     # Если платеж не прошёл
     elif(action_pay != 0): 
-        state_pay = ' FALL' #Если платёж не прошёл, то при выводе инфо добавляется FALL
-        pay_sum_fall += pay_sum #Сумма не проведенных платежей
-        abonent_count_fall += 1 #Увеличить количество не прошедших платежей на 1
+        state_pay = ' FALL' # Если платёж не прошёл, то при выводе инфо добавляется FALL
+        pay_sum_fall += pay_sum # Сумма не проведенных платежей
+        abonent_count_fall += 1 # Увеличить количество не прошедших платежей на 1
         return pay_sum_fall, abonent_count_fall
     else:
         state_pay = ''
@@ -149,7 +149,7 @@ def archive(zip_path,unzip_path,zip_complate_path,
             messagebox.showerror('Ошибка', 'Неизвестный тип архива')
             return False
         r_zip.close()
-        shutil.move(arch,zip_complate_path+'complate'+zip_name)
+        shutil.move(arch,zip_complate_path+'complate_'+zip_name)
         z_name = str(service)
         r_list = [str(reester_rename),str(z_name)]
         return r_list
@@ -164,27 +164,30 @@ def archive(zip_path,unzip_path,zip_complate_path,
 def internet_pay(abonent,pay_sum,trans_num):
     # Если posix система (Linux, Mac)
     if os_name == 'posix':
+        print(os_name)
         pay_string = '/home/k/Dropbox/java/sberbankFX/utm5_payment_tool/utm5_payment_tool -a %d -b %s -e %s -C /netup/utm5/utm5_payment_tool.cfg' % (abonent, pay_sum, trans_num)
     # Если nt система (Windows)
     elif os_name == 'nt':
-        #pay_string == '/home/k/Dropbox/java/sberbankFX/utm5_payment_tool/utm5_payment_tool -a %d -b %s -e %s -C /netup/utm5/utm5_payment_tool.cfg' % (abonent, pay_sum, trans_num)
-        pay_string = 'string pay'
+        print(os_name)
+        pay_string = "C:\\Program Files\\NetUp\\UTM5\\utm5_payment_tool.exe -a %d -b %s -e %s -C C:\\Program Files\\NetUp\\UTM5\\utm5_payment_tool.cfg" % (abonent, pay_sum, trans_num)
+        #pay_string = 'string pay'
     else:
         print('Error. Invalid OS name')
         return 1
-    print('pay_string',pay_string)
     try:
         out = subprocess.call(pay_string,shell=True,stdout=PIPE)
+        print('out ',out)
         return out
     except Exception as e:
-        print ('subprocess error ',e)
+        print('subprocess error ',e)
         out = 1
         return out
 
 
 # Внесение платежей за ТВ в биллинг Atirra
 def tv_pay(abonent,pay_sum,trans_num):
-    pay_string = 'http://192.168.0.10/tv_sber_reesters.php?command=pay&account=%d&sum=%s&txn_id=%s' % (abonent, pay_sum, trans_num)#внесение платежей за тв в Atirra
+    # Внесение платежей за тв в Atirra
+    pay_string = 'http://192.168.0.10/tv_sber_reesters.php?command=pay&account=%d&sum=%s&txn_id=%s' % (abonent, pay_sum, trans_num)
     response = urllib.request.urlopen(pay_string)
     content = response.read().decode('UTF-8')
     n_cont = content.replace('\ufeff',' ').split()
@@ -260,20 +263,19 @@ def get_pay(result_txt,zip_path,unzip_path,zip_complate_path,
                       # Результат выполнения функции
                       action_pay = int()
                       action_pay = internet_pay(abonent,pay_sum,trans_num)
-                      print('action_pay',action_pay)
                       # Запуск функции эмитации платежа за интернет
                       #action_pay = pay_test(abonent,pay_sum,trans_num)
                   except:
                       messagebox.showerror('Ошибка','Не удалось внести платёж')
                       return 3                
-          finally:
-                print ('Результат: '+str(action_pay))
-                type_pay(abonent, pay_sum, trans_num, date_transaction, date_check, action_pay)
-                result_row = '№:'+str(trans_num).strip()+' дата платежа:'+str(date_transaction)+' л/с:'+str(abonent).rstrip()+' сумма:'+str(pay_sum)+' дата получения:'+str(date_transaction)+state_pay+';'
-                result_txt.insert(INSERT,str(result_row)+'\n')
-                pay_sum_amount += pay_sum # Сумма платежей в реестре  
-                i += 1 # Увеличить счетчик цикла while на 1
-                reester_len -= 1 # Уменьшить счетчик количества платежей на 1
+          #finally:
+          print ('Результат: '+str(action_pay))
+          type_pay(abonent, pay_sum, trans_num, date_transaction, date_check, action_pay)
+          result_row = '№:'+str(trans_num).strip()+' дата платежа:'+str(date_transaction)+' л/с:'+str(abonent).rstrip()+' сумма:'+str(pay_sum)+' дата получения:'+str(date_transaction)+state_pay+';'
+          result_txt.insert(INSERT,str(result_row)+'\n')
+          pay_sum_amount += pay_sum # Сумма платежей в реестре  
+          i += 1 # Увеличить счетчик цикла while на 1
+          reester_len -= 1 # Уменьшить счетчик количества платежей на 1
                 
     # Если реестр за телевидение    
     elif(str(r_name_list[1]) == service_tv):
@@ -281,7 +283,7 @@ def get_pay(result_txt,zip_path,unzip_path,zip_complate_path,
     # Проверка соединения с сервером FireBird 2.5 - ATIRRA
         try:
             # Подключение к серверу Atirra
-            #atirra_connection_test= fdb.connect(dsn='192.168.0.13:ATIRRA', user='SYSDBA', password='masterkey') #Подключение к серверу Atirra
+            #atirra_connection_test= fdb.connect(dsn='192.168.0.13:ATIRRA', user='SYSDBA', password='masterkey')
             pass
         except:
             messagebox.showerror('Ошибка', 'Не удалось подключиться к серверу ATIRRA')
@@ -331,18 +333,18 @@ def get_pay(result_txt,zip_path,unzip_path,zip_complate_path,
                       messagebox.showerror('Ошибка', 'Не удалось внести платёж')
                       return 3
 
-          finally:
-              print ('Результат: '+str(action_pay))
+          #finally:
+          print ('Результат: '+str(action_pay))
               
-              type_pay(abonent, pay_sum, trans_num, date_transaction, date_check, action_pay)
+          type_pay(abonent, pay_sum, trans_num, date_transaction, date_check, action_pay)
               
-              result_row = '№:'+str(trans_num).strip()+' дата платежа:'+str(date_transaction)+' л/с:'+str(abonent).rstrip()+' сумма:'+str(pay_sum)+' дата получения:'+str(date_transaction)+state_pay+' ;' 
-              result_txt.insert(INSERT,str(result_row)+'\n')
-              # Сумма платежей в реестре 
-              pay_sum_amount += pay_sum      
-              # Увеличить счетчик цикла while на 1
-              i += 1
-              reester_len -= 1 # Уменьшить счетчик количества реестров на 1       
+          result_row = '№:'+str(trans_num).strip()+' дата платежа:'+str(date_transaction)+' л/с:'+str(abonent).rstrip()+' сумма:'+str(pay_sum)+' дата получения:'+str(date_transaction)+state_pay+' ;' 
+          result_txt.insert(INSERT,str(result_row)+'\n')
+          # Сумма платежей в реестре 
+          pay_sum_amount += pay_sum      
+          # Увеличить счетчик цикла while на 1
+          i += 1
+          reester_len -= 1 # Уменьшить счетчик количества реестров на 1       
 
     else:
         messagebox.showerror('Ошибка', 'Неизвестный тип реестра')
@@ -380,8 +382,10 @@ def get_pay(result_txt,zip_path,unzip_path,zip_complate_path,
         file.write(result_txt.get(1.0,END))
         
     reester.close()
-    result_txt.configure(state='disable')#Запретить редактирование поля вывода платежей
-    shutil.move(fd, path_complate+state_reester+reester_name)# Перемещение реестра если он успешно обработан
+    # Запретить редактирование поля вывода платежей
+    result_txt.configure(state='disable')
+    # Перемещение реестра если он успешно обработан
+    shutil.move(fd, path_complate+state_reester+reester_name)
 
 
 # Функция открытия и просмотра реестра в окне программы
@@ -397,7 +401,7 @@ def open_register(result_txt,path_result):
         result_txt.configure(state='normal')
         # Очистка поля вывода платежей
         result_txt.delete(1.0,END)
-        #Открываем реестр
+        # Открываем реестр
         with open(str(register_path)) as file:
             # Читаем реестр
             line = file.read() 
