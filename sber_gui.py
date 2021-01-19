@@ -22,14 +22,11 @@ service_tv = '01' # ТВ (телевидение)
 service = str() # Переменная для извлечения типа услуги
 os_name = os.name # Хранит тип ОС
 
-#Описание путей к каталогам для работы программы
+# Описание путей к каталогам для работы программы
 
-# Функция получает путь к корневому каталогу проекта
-def get_project_folder_path():
-    # Переменная для хранения пути к каталогу
-    registries_folder_path = str()
-    # Получаем путь до каталога с скриптом
-    path = os.getcwd()
+# Функция определяет тип ОС: WIN или POSIX
+
+def get_os_type():
     # Определение разделителя каталогов
     # Если ОС Windows
     if os_name == 'nt':
@@ -40,6 +37,15 @@ def get_project_folder_path():
     else:
         print('Error. Не удалось определить операционную систему')
         exit()
+    return spliter
+
+# Функция получает путь к корневому каталогу проекта
+def get_project_folder_path():
+    # Получаем путь до каталога с скриптом
+    path = os.getcwd()
+    # Переменная для хранения пути к каталогу
+    registries_folder_path = str()
+    spliter = get_os_type()
     # Разделяем полученный путь полученным разделителем и отсекаем последний элемент
     path = path.split(spliter)[0:-1]
     # Собираем полученный путь до корневой папки проекта с отсечением папки скрипта
@@ -51,8 +57,9 @@ def get_project_folder_path():
 
 # Функция проверки существования необходимых папок и их создание при необходимости
 def check_exists_folders(folders_list):
+    spliter = get_os_type()
     for folder in folders_list:
-        folder_name = '/' + folder.split('/')[-2]
+        folder_name = spliter + folder.split(spliter)[-2]
         if os.path.exists(folder):
             print(folder_name + ' каталог уже существет')
         else:
