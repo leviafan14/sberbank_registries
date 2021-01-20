@@ -4,20 +4,21 @@ from sber_gui import *
 #global registries_folder_path,zip_path,unzip_path,path_complate,zip_complate_path,path_result,folder_list,path_reesters,folders_list
 
 def main():
-    # Корневой путь к каталогу проекта
-    registries_folder_path = get_project_folder_path()
+    # Распаковка корневого пути к каталогу проекта и разделителя ОС
+    registries_folder_path, spliter = get_project_folder_path()
+    print(str(registries_folder_path))
     # Каталог из которого загружаем архив с реестром
-    zip_path = registries_folder_path+'download_zip/'
+    zip_path = str(registries_folder_path)+'download_zip'+spliter
     # Каталог в который распаковываем реестр
-    unzip_path = registries_folder_path+'reesters/'
+    unzip_path = registries_folder_path+'reesters'+spliter
     # Каталог обработанных архивов
-    zip_complate_path = registries_folder_path+'complate_zip/'
+    zip_complate_path = registries_folder_path+'complate_zip'+spliter
     # Каталог обработанных реестров
-    path_complate = registries_folder_path+'complate_reesters/'
+    path_complate = registries_folder_path+'complate_reesters'+spliter
     # Каталог из которого берётся реестр для обработки
-    path_reesters = registries_folder_path+'reesters/'
+    path_reesters = registries_folder_path+'reesters'+spliter
     # Каталог для результатов обработки реестра
-    path_result = registries_folder_path+'result_registries/'
+    path_result = registries_folder_path+'result_registries'+spliter
     # Список путей к каталогам
     folders_list = [zip_path,unzip_path,path_complate,zip_complate_path,path_result]
 
